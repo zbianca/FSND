@@ -6,6 +6,7 @@ import json
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 import logging
@@ -16,12 +17,19 @@ from forms import *
 # App Config.
 #----------------------------------------------------------------------------#
 
-app = Flask(__name__)
-moment = Moment(app)
-app.config.from_object('config')
-db = SQLAlchemy(app)
 
-# TODO: connect to a local postgresql database
+def create_app(config):
+    _app = Flask(__name__)
+    _app.config.from_pyfile(config)
+    moment.init_app(_app)
+    return _app
+
+
+moment = Moment()
+app = create_app('config.py')
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
 
 #----------------------------------------------------------------------------#
 # Models.
