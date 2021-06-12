@@ -35,6 +35,17 @@ migrate = Migrate(app, db)
 # Models.
 #----------------------------------------------------------------------------#
 
+venueGenres = db.Table('Venue_Genres',
+                       db.Column('genre_id', db.Integer, db.ForeignKey('Genre.id'), nullable=False),
+                       db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), nullable=False)
+                       )
+
+artistGenres = db.Table('Artist_Genres',
+                        db.Column('genre_id', db.Integer, db.ForeignKey('Genre.id'), nullable=False),
+                        db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), nullable=False)
+                        )
+
+
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -48,7 +59,7 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
     status = db.Column(db.String(120))
-    genres = db.relationship('Venue_Genres', backref='venue')
+    genres = db.relationship('Genre', secondary=venueGenres, lazy='subquery', backref='venue')
 
 
 class Artist(db.Model):
@@ -63,7 +74,7 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
     status = db.Column(db.String(120))
-    genres = db.relationship('Artist_Genres', backref='artist')
+    genres = db.relationship('Genre', secondary=artistGenres, lazy='subquery', backref='artist')
 
 
 class Show(db.Model):
@@ -80,17 +91,6 @@ class Genre(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-
-
-venueGenres = db.Table('Venue_Genres',
-                       db.Column('genre_id', db.Integer, db.ForeignKey('Genre.id'), nullable=False),
-                       db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), nullable=False)
-                       )
-
-artistGenres = db.Table('Artist_Genres',
-                        db.Column('genre_id', db.Integer, db.ForeignKey('Genre.id'), nullable=False),
-                        db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), nullable=False)
-                        )
 
 
 #----------------------------------------------------------------------------#
@@ -111,9 +111,10 @@ app.jinja_env.filters['datetime'] = format_datetime
 # Controllers.
 #----------------------------------------------------------------------------#
 
+
 @app.route('/')
 def index():
-  return render_template('pages/home.html')
+    return render_template('pages/home.html')
 
 
 #  Venues
@@ -121,30 +122,26 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+    data = []
+    areas = Venue.query.distinct(Venue.city, Venue.state).all()
+
+    for area in areas:
+        venues_query = Venue.query.filter_by(city=area.city).filter_by(state=area.state)
+
+        _venues = []
+        for venue in venues_query:
+            _venues.append({
+              "id": venue.id,
+              "name": venue.name
+            })
+
+        data.append({
+          "city": area.city,
+          "state": area.state,
+          "venues": _venues
+        })
+    return render_template('pages/venues.html', areas=data)
+
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
