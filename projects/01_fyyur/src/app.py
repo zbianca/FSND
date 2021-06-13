@@ -58,7 +58,7 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-    status = db.Column(db.String(120))
+    status = db.Column(db.String(280))
     genres = db.relationship('Genre', secondary=venueGenres, lazy='subquery', backref='venue')
 
     def __repr__(self):
@@ -76,7 +76,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(120))
-    status = db.Column(db.String(120))
+    status = db.Column(db.String(280))
     genres = db.relationship('Genre', secondary=artistGenres, lazy='subquery', backref='artist')
 
     def __repr__(self):
