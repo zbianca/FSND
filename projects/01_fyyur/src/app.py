@@ -13,7 +13,6 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from forms import *
-import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -403,10 +402,43 @@ def edit_artist(artist_id):
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
-  # TODO: take values from the form submitted, and update existing
-  # artist record with ID <artist_id> using the new attributes
+    form = ArtistForm(meta={'csrf': False})
+    status = None
+    try:
+        if form.validate_on_submit():
 
-  return redirect(url_for('show_artist', artist_id=artist_id))
+            if form.seeking_venue.data == True and form.seeking_description:
+                status = form.seeking_description.data
+
+            artist = Artist.query.get_or_404(artist_id)
+            artist.name = form.name.data
+            artist.city = form.city.data
+            artist.state = form.state.data
+            artist.phone = form.phone.data
+            artist.image_link = form.image_link.data
+            artist.facebook_link = form.facebook_link.data
+            artist.website_link = form.website_link.data
+            artist.status = status
+
+            for genre in form.genres.data:
+                entry = Genre.query.get(genre)
+                artist.genres.append(entry)
+
+            db.session.add(artist)
+            db.session.commit()
+
+            flash('Artist ' + form.name.data + ' was successfully updated!')
+        else:
+            errorMessage = "Please correct the following information: "
+            for error in form.errors:
+                errorMessage += error + " "
+            flash(errorMessage)
+    except:
+        db.session.rollback()
+        flash('An error occurred. Artist ' + form.name.data + ' could not be updated.')
+    finally:
+        db.session.close()
+    return redirect(url_for('show_artist', artist_id=artist_id))
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -440,9 +472,46 @@ def edit_venue(venue_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
-  # TODO: take values from the form submitted, and update existing
-  # venue record with ID <venue_id> using the new attributes
-  return redirect(url_for('show_venue', venue_id=venue_id))
+    form = VenueForm(meta={'csrf': False})
+    status = None
+    try:
+        if form.validate_on_submit():
+
+            if form.seeking_talent.data == True and form.seeking_description:
+                status = form.seeking_description.data
+
+            venue = Venue.query.get_or_404(venue_id)
+            venue.name=form.name.data
+            venue.city=form.city.data
+            venue.state=form.state.data
+            venue.address=form.address.data
+            venue.phone=form.phone.data
+            venue.image_link=form.image_link.data
+            venue.facebook_link=form.facebook_link.data
+            venue.website_link=form.website_link.data
+            venue.status=status
+
+            for genre in form.genres.data:
+                entry = Genre.query.get(genre)
+                venue.genres.append(entry)
+
+            db.session.add(venue)
+            db.session.commit()
+
+            flash('Venue ' + form.name.data + ' was successfully updated!')
+        else:
+            errorMessage = "Please correct the following information: "
+            for error in form.errors:
+                errorMessage += error + " "
+            flash(errorMessage)
+    except:
+        Raise
+        db.session.rollback()
+        flash('An error occurred. Venue ' + form.name.data + ' could not be updated.')
+    finally:
+        db.session.close()
+    return redirect(url_for('show_venue', venue_id=venue_id))
+
 
 #  Create Artist
 #  ----------------------------------------------------------------

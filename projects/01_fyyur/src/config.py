@@ -11,3 +11,5 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://bianca@localhost:5432/fyyur'
 
 # Disable tracking modifications of objects and emit signals (default = None)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+WTF_CSRF_CHECK_DEFAULT = False
