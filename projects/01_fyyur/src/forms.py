@@ -1,9 +1,10 @@
 from datetime import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms.validators import DataRequired, Length, Optional, URL
 
-class ShowForm(Form):
+
+class ShowForm(FlaskForm):
     artist_id = StringField(
         'artist_id'
     )
@@ -13,18 +14,20 @@ class ShowForm(Form):
     start_time = DateTimeField(
         'start_time',
         validators=[DataRequired()],
-        default= datetime.today()
+        default=datetime.today()
     )
 
-class VenueForm(Form):
+
+class VenueForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', validators=[DataRequired(), Length(max=120)]
     )
     state = SelectField(
         'state', validators=[DataRequired()],
+        validate_choice=True,
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -80,63 +83,63 @@ class VenueForm(Form):
         ]
     )
     address = StringField(
-        'address', validators=[DataRequired()]
+        'address', validators=[DataRequired(), Length(max=120)]
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[Length(max=120), Optional(strip_whitespace=True)]
     )
     image_link = StringField(
-        'image_link'
+        'image_link', validators=[Length(max=500), Optional(strip_whitespace=True)]
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'genres', validators=[Optional()],
+        validate_choice=True,
         choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
+            ('9', 'Alternative'),
+            ('10', 'Blues'),
+            ('4', 'Classical'),
+            ('11', 'Country'),
+            ('12', 'Electronic'),
+            ('5', 'Folk'),
+            ('13', 'Funk'),
+            ('8', 'Hip-Hop'),
+            ('14', 'Heavy Metal'),
+            ('15', 'Instrumental'),
+            ('1', 'Jazz'),
+            ('16', 'Musical Theatre'),
+            ('17', 'Pop'),
+            ('18', 'Punk'),
+            ('7', 'R&B'),
+            ('2', 'Reggae'),
+            ('6', 'Rock n Roll'),
+            ('19', 'Soul'),
+            ('20', 'Other'),
         ]
     )
     facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[URL(), Length(max=120), Optional(strip_whitespace=True)]
     )
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL(), Length(max=120), Optional(strip_whitespace=True)]
     )
 
-    seeking_talent = BooleanField( 'seeking_talent' )
+    seeking_talent = BooleanField('seeking_talent')
 
     seeking_description = StringField(
-        'seeking_description'
+        'seeking_description', validators=[Length(max=280), Optional(strip_whitespace=True)]
     )
 
 
-
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField(
         'name', validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'city', validators=[DataRequired(), Length(max=120)]
     )
     state = SelectField(
         'state', validators=[DataRequired()],
+        validate_choice=True,
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -192,48 +195,47 @@ class ArtistForm(Form):
         ]
     )
     phone = StringField(
-        # TODO implement validation logic for state
-        'phone'
+        'phone', validators=[Length(max=120)]
     )
     image_link = StringField(
-        'image_link'
+        'image_link', validators=[Length(max=500)]
     )
     genres = SelectMultipleField(
         'genres', validators=[DataRequired()],
+        validate_choice=True,
         choices=[
-            ('Alternative', 'Alternative'),
-            ('Blues', 'Blues'),
-            ('Classical', 'Classical'),
-            ('Country', 'Country'),
-            ('Electronic', 'Electronic'),
-            ('Folk', 'Folk'),
-            ('Funk', 'Funk'),
-            ('Hip-Hop', 'Hip-Hop'),
-            ('Heavy Metal', 'Heavy Metal'),
-            ('Instrumental', 'Instrumental'),
-            ('Jazz', 'Jazz'),
-            ('Musical Theatre', 'Musical Theatre'),
-            ('Pop', 'Pop'),
-            ('Punk', 'Punk'),
-            ('R&B', 'R&B'),
-            ('Reggae', 'Reggae'),
-            ('Rock n Roll', 'Rock n Roll'),
-            ('Soul', 'Soul'),
-            ('Other', 'Other'),
+            ('9', 'Alternative'),
+            ('10', 'Blues'),
+            ('4', 'Classical'),
+            ('11', 'Country'),
+            ('12', 'Electronic'),
+            ('5', 'Folk'),
+            ('13', 'Funk'),
+            ('8', 'Hip-Hop'),
+            ('14', 'Heavy Metal'),
+            ('15', 'Instrumental'),
+            ('1', 'Jazz'),
+            ('16', 'Musical Theatre'),
+            ('17', 'Pop'),
+            ('18', 'Punk'),
+            ('7', 'R&B'),
+            ('2', 'Reggae'),
+            ('6', 'Rock n Roll'),
+            ('19', 'Soul'),
+            ('20', 'Other'),
         ]
      )
     facebook_link = StringField(
-        # TODO implement enum restriction
-        'facebook_link', validators=[URL()]
+        'facebook_link', validators=[URL(), Length(max=120), Optional(strip_whitespace=True)]
      )
 
     website_link = StringField(
-        'website_link'
+        'website_link', validators=[URL(), Length(max=120), Optional(strip_whitespace=True)]
      )
 
-    seeking_venue = BooleanField( 'seeking_venue' )
+    seeking_venue = BooleanField('seeking_venue')
 
     seeking_description = StringField(
-            'seeking_description'
+            'seeking_description', validators=[Length(max=280)]
      )
 
