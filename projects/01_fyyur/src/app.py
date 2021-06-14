@@ -415,21 +415,44 @@ def edit_venue_submission(venue_id):
 
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
-  form = ArtistForm()
-  return render_template('forms/new_artist.html', form=form)
+    form = ArtistForm()
+    return render_template('forms/new_artist.html', form=form)
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-  # called upon submitting the new artist listing form
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+    form = ArtistForm(meta={'csrf': False})
+    status = None
+    try:
+        if form.validate_on_submit():
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
-  return render_template('pages/home.html')
+            if form.seeking_venue.data == True and form.seeking_description:
+                status = form.seeking_description.data
 
+            artist = Artist(name=form.name.data, city=form.city.data,
+                        state=form.state.data, phone=form.phone.data,
+                        image_link=form.image_link.data,
+                        facebook_link=form.facebook_link.data,
+                        website_link=form.website_link.data, status=status)
+
+            for genre in form.genres.data:
+                entry = Genre.query.get(genre)
+                artist.genres.append(entry)
+
+            db.session.add(artist)
+            db.session.commit()
+
+            flash('Artist ' + form.name.data + ' was successfully listed!')
+        else:
+            errorMessage = "Please correct the following information: "
+            for error in form.errors:
+                errorMessage += error + " "
+            flash(errorMessage)
+    except:
+        db.session.rollback()
+        flash('An error occurred. Artist ' + form.name.data + ' could not be listed.')
+    finally:
+        db.session.close()
+    return render_template('pages/home.html')
 
 #  Shows
 #  ----------------------------------------------------------------
