@@ -27,7 +27,6 @@ class VenueForm(FlaskForm):
     )
     state = SelectField(
         'state', validators=[DataRequired()],
-        validate_choice=True,
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -93,7 +92,6 @@ class VenueForm(FlaskForm):
     )
     genres = SelectMultipleField(
         'genres', validators=[Optional()],
-        validate_choice=True,
         choices=[
             ('9', 'Alternative'),
             ('10', 'Blues'),
@@ -139,7 +137,6 @@ class ArtistForm(FlaskForm):
     )
     state = SelectField(
         'state', validators=[DataRequired()],
-        validate_choice=True,
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -202,7 +199,6 @@ class ArtistForm(FlaskForm):
     )
     genres = SelectMultipleField(
         'genres', validators=[DataRequired()],
-        validate_choice=True,
         choices=[
             ('9', 'Alternative'),
             ('10', 'Blues'),
