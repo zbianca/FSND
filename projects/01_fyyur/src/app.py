@@ -14,7 +14,7 @@ import logging
 from logging import Formatter, FileHandler
 from forms import *
 from models import *
-import sys
+from extensions import db
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -31,9 +31,8 @@ def create_app(config):
 moment = Moment()
 csrf = CSRFProtect()
 app = create_app('config.py')
-db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
+db.init_app(app)
 
 #----------------------------------------------------------------------------#
 # Filters.
