@@ -25,9 +25,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
     CORS(app, resources={r"/*": {"origins": "*"}})
-    '''
-    @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
-    '''
+    # TODO: Set up CORS
 
     # CORS Headers
     @app.after_request
@@ -133,14 +131,27 @@ def create_app(test_config=None):
         except:
             abort(422)
 
-    '''
-    @TODO: 
-    Create a GET endpoint to get questions based on category. 
-  
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
+    # Get questions based on category
+    @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+    def get_questions_by_category(category_id):
+        try:
+            questions = Question.query.filter_by(category=category_id).order_by(Question.id).all()
+
+            if not questions:
+                abort(404)
+
+            current_questions = paginate_questions(request, questions)
+            category = Category.query.get(category_id)
+
+            return jsonify({
+                'success': True,
+                'questions': current_questions,
+                'total_questions': len(questions),
+                'current_category': category.type
+            })
+
+        except:
+            abort(422)
 
     '''
     @TODO: 
