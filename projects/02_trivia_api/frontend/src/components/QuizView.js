@@ -25,8 +25,8 @@ class QuizView extends Component {
     $.ajax({
       url: `${PATH}/categories`,
       type: "GET",
-      success: (result) => {
-        this.setState({ categories: result.categories })
+      success: (response) => {
+        this.setState({ categories: response.categories })
         return;
       },
       error: (error) => {
@@ -36,7 +36,7 @@ class QuizView extends Component {
     })
   }
 
-  selectCategory = ({type, id=0}) => {
+  selectCategory = (type='All', id=0) => {
     this.setState({quizCategory: {type, id}}, this.getNextQuestion)
   }
 
@@ -61,13 +61,13 @@ class QuizView extends Component {
         withCredentials: true
       },
       crossDomain: true,
-      success: (result) => {
+      success: (response) => {
         this.setState({
           showAnswer: false,
           previousQuestions: previousQuestions,
-          currentQuestion: result.question,
+          currentQuestion: response.question,
           guess: '',
-          forceEnd: result.question ? false : true
+          forceEnd: response.question ? false : true
         })
         return;
       },
@@ -105,15 +105,15 @@ class QuizView extends Component {
           <div className="quiz-play-holder">
               <div className="choose-header">Choose Category</div>
               <div className="category-holder">
-                  <div className="play-category" onClick={this.selectCategory}>ALL</div>
-                  {Object.keys(this.state.categories).map(id => {
+                  <div className="play-category" onClick={() => this.selectCategory('All', 0)}>ALL</div>
+                  {this.state.categories.map(cat => {
                   return (
                     <div
-                      key={id}
-                      value={id}
+                      key={cat.id}
+                      value={cat.id}
                       className="play-category"
-                      onClick={() => this.selectCategory({type:this.state.categories[id], id})}>
-                      {this.state.categories[id]}
+                      onClick={() => this.selectCategory(cat.type, cat.id)}>
+                      {cat.type}
                     </div>
                   )
                 })}
