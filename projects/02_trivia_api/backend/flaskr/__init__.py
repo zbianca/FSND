@@ -81,7 +81,7 @@ def create_app(test_config=None):
     # Create a new question
     # Search questions
     @app.route('/questions', methods=['POST'])
-    def create_question():
+    def create_question_or_search_in_questions():
         body = request.get_json()
 
         query = body.get('searchTerm', None)
