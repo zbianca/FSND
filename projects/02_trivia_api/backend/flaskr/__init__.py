@@ -75,7 +75,8 @@ def create_app(test_config=None):
         question.delete()
 
         return jsonify({
-            'success': True
+            'success': True,
+            'deleted': question_id
         })
 
     # Create a new question
@@ -199,5 +200,13 @@ def create_app(test_config=None):
             "error": 405,
             "message": "method not allowed"
         }), 405
+
+    @app.errorhandler(500)
+    def server_error(error):
+        return jsonify({
+            "success": False,
+            "error": 500,
+            "message": "internal server error"
+        }), 500
 
     return app
