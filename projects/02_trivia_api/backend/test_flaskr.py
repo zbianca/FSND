@@ -38,6 +38,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['categories'])
         self.assertTrue(len(data['categories']))
 
+    def test_post_categories_not_allowed(self):
+        res = self.client().post('/categories')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+
     def test_retrieve_questions(self):
         res = self.client().get('/questions')
         data = json.loads(res.data)
@@ -57,8 +63,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(question, None)
 
-    def test_404_if_question_does_not_exist(self):
+    def test_404_cannot_delete_question(self):
         res = self.client().delete('/questions/1234')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
+
+    def test_404_page_does_not_exist(self):
+        res = self.client().get('/questions/?page=1234')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
@@ -107,6 +121,16 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['totalQuestions'], 1)
+
+    def test_search_failure(self):
+        search = {
+            'searchTerm': None,
+        }
+
+        res = self.client().post('/questions', json=search)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
 
     def test_get_questions_by_category(self):
         res = self.client().get('/categories/6/questions')
