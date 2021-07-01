@@ -7,15 +7,20 @@ from flask_cors import CORS
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
+
 app = Flask(__name__)
 setup_db(app)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+AUTH0_DOMAIN = 'https://coffee-shop-fs-bianca.eu.auth0.com/'
+ALGORITHMS = ['RS256']
+API_AUDIENCE = 'http://localhost:5000'
 
 '''
-@TODO uncomment the following line to initialize the datbase
+uncomment the following line to initialize the database
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-!! Running this funciton will add one
+!! Running this function will add one
 '''
 # db_drop_and_create_all()
 
@@ -28,6 +33,26 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+
+
+# @app.route('/drinks')
+# def get_drinks():
+#     try:
+#         drinks = Drink.query.all()
+#     except Exception:
+#         abort(422)
+#
+#     print(drinks)
+#
+#     # Make sure we got some categories
+#     if not drinks:
+#         abort(404)
+#
+#     # Return the categories
+#     return jsonify({
+#         'success': True,
+#         'drinks': [drink.short() for drink in drinks],
+#         })
 
 
 '''
