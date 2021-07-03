@@ -4,7 +4,7 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-AUTH0_DOMAIN = 'https://coffee-shop-fs-bianca.eu.auth0.com/'
+AUTH0_DOMAIN = 'coffee-shop-fs-bianca.eu.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'http://localhost:5000'
 
@@ -80,20 +80,20 @@ def get_token_auth_header():
 
 
 def check_permissions(permission, payload):
-    if payload.get('permissions'):
-        _permissions = payload.get("permissions")
-        if permission not in _permissions:
-            raise AuthError({
-                'code': 'invalid_permissions',
-                'description': 'User does not have enough privileges'
-            }, 403)
-        else:
-            return True
-    else:
+    if 'permissions' not in payload:
         raise AuthError({
-            'code': 'invalid_permissions',
-            'description': 'User does not have any roles attached'
+            'code': 'unauthorized',
+            'description': 'Permissions not included in request.'
+        }, 401)
+
+    elif permission not in payload['permissions']:
+        raise AuthError({
+            'code': 'forbidden',
+            'description': 'Not allowed.'
         }, 403)
+
+    else:
+        return True
 
 
 '''
@@ -186,10 +186,8 @@ def requires_auth(permission=''):
                 payload = verify_decode_jwt(token)
             except:
                 abort(401)
-            try:
-                check_permissions(permission, payload)
-            except:
-                abort(403)
+
+            check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
         return wrapper
