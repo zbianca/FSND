@@ -12,9 +12,6 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-AUTH0_DOMAIN = 'https://coffee-shop-fs-bianca.eu.auth0.com/'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'http://localhost:5000'
 
 '''
 uncomment the following line to initialize the database
@@ -61,7 +58,7 @@ returns status code 200 and json {"success": True, "drinks": drinks} where drink
 
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+def get_drinks_detail(payload):
     try:
         drinks = Drink.query.all()
 
@@ -88,7 +85,7 @@ returns status code 200 and json {"success": True, "drinks": drink} where drink 
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def create_drink():
+def create_drink(payload):
     body = request.get_json()
     title = body.get('title', None)
     recipe = body.get('recipe', None)
@@ -100,7 +97,7 @@ def create_drink():
         recipe = [recipe]
 
     try:
-        drink = Drink(title=title, recipe=recipe)
+        drink = Drink(title=title, recipe=json.dumps(recipe))
         drink.insert()
 
         return jsonify({
@@ -125,7 +122,7 @@ returns status code 200 and json {"success": True, "drinks": drink} where drink 
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def update_drink(drink_id):
+def update_drink(payload, drink_id):
     body = request.get_json()
     title = body.get('title', None)
     recipe = body.get('recipe', None)
@@ -145,7 +142,7 @@ def update_drink(drink_id):
         abort(404)
 
     drink.title = title
-    drink.recipe = recipe
+    drink.recipe = json.dumps(recipe)
     drink.update()
 
     return jsonify({
@@ -167,7 +164,7 @@ returns status code 200 and json {"success": True, "delete": id} where id is the
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_question(drink_id):
+def delete_question(payload, drink_id):
     try:
         drink = Drink.query.get(drink_id)
     except:

@@ -8,7 +8,7 @@ export const environment = {
   auth0: {
     url: 'coffee-shop-fs-bianca.eu', // the auth0 domain prefix
     audience: 'http://localhost:5000', // the audience set for the auth0 app
-    clientId: 'k2uaIHxIssazbkUThkr7B0ldpqsUmHFl', // the client id generated for the auth0 app
+    clientId: 'O7NuQI6hq4Za5uWrSALYocXvqS5JfEaE', // the client id generated for the auth0 app
     callbackURL: 'http://localhost:8100', // the base url of the running ionic application.
   }
 };
