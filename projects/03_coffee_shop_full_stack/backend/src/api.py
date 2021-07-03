@@ -12,14 +12,13 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-
 '''
 uncomment the following line to initialize the database
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this function will add one
 '''
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -139,7 +138,10 @@ def update_drink(payload, drink_id):
         abort(422)
 
     if not drink:
-        abort(404)
+        return json.dumps({
+            'success': False,
+            'error': 'Drink not found to be edited'
+        }), 404
 
     drink.title = title
     drink.recipe = json.dumps(recipe)
@@ -171,7 +173,10 @@ def delete_question(payload, drink_id):
         abort(422)
 
     if not drink:
-        abort(404)
+        return json.dumps({
+            'success': False,
+            'error': 'Drink not found to be deleted'
+        }), 404
 
     try:
         drink.delete()
